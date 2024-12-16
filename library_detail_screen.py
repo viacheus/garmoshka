@@ -42,6 +42,8 @@ class LibraryDetailScreen(QWidget):
         self.table.setColumnCount(3)
 
         self.fill_table()
+        self.table.resizeRowsToContents()
+        self.table.resizeColumnsToContents()
 
         self.table.cellClicked.connect(self.handle_cell_click)
         self.table.cellDoubleClicked.connect(self.show_card_modal)
@@ -71,8 +73,6 @@ class LibraryDetailScreen(QWidget):
 
         layout.addLayout(button_layout)
 
-        self.resizeEvent(None)
-
     def fill_table(self):
         self.table.clearContents()
 
@@ -88,29 +88,32 @@ class LibraryDetailScreen(QWidget):
             self.table.setItem(i, 0, que)
             self.table.setItem(i, 1, ans)
             progress_bar = QProgressBar()
+            # progress_bar.setFixedWidth(200)
+            # progress_bar.setGeometry(50, 50, 200, 30)
             progress_bar.setValue(self.calc_progress(card))
             self.table.setCellWidget(i, 2, progress_bar)
             self.rows_to_card_ids[i] = card[0]
 
-        self.table.resizeRowsToContents()
-        self.table.resizeColumnsToContents()
-
     def show_card_modal(self, row=None, column=None):
+        if self.sureness_evaluation_in_progress:
+            return
         card_id = self.rows_to_card_ids[row] if row is not False else None
         modal = CardEditModal(self.library_name, card_id)
         modal.exec()
         self.fill_table()
 
     def edit_library_modal(self):
+        if self.sureness_evaluation_in_progress:
+            return
         modal = LibraryEditModal(self.library_name)
         modal.exec()
         self.on_back_clicked()
 
     def resizeEvent(self, event):
         total_width = self.table.viewport().width()
-        self.table.setColumnWidth(0, int(total_width * 0.45))
-        self.table.setColumnWidth(1, int(total_width * 0.45))
-        self.table.setColumnWidth(2, int(total_width * 0.1))
+        self.table.setColumnWidth(0, int(total_width * 0.35))
+        self.table.setColumnWidth(1, int(total_width * 0.35))
+        self.table.setColumnWidth(2, int(total_width * 0.3))
         super().resizeEvent(event)
 
     def calc_progress(self, card):
@@ -148,8 +151,6 @@ class LibraryDetailScreen(QWidget):
             cell_widget = QWidget()
             cell_widget.setLayout(layout)
             self.table.setCellWidget(row, 2, cell_widget)
-            self.table.resizeRowsToContents()
-            self.table.resizeColumnsToContents()
 
     def make_button_handler(self, knowledge_feeling_number):
         def knowledge_feeling_button_clicked():
@@ -165,6 +166,8 @@ class LibraryDetailScreen(QWidget):
         return knowledge_feeling_button_clicked
 
     def clear_stat(self):
+        if self.sureness_evaluation_in_progress:
+            return
         confirmation = QMessageBox.question(
             self,
             "Подтверждение сброса",

@@ -6,8 +6,9 @@ authors = ["Viacheus <glorianfox@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "<3.14,>=3.8"
 pyqt6 = "^6.7.1"
+pyinstaller = "^6.11.1"
 
 
 [build-system]

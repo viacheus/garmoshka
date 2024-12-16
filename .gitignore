@@ -15,6 +15,7 @@ build/
 dist/
 *.egg-info/
 *.eggs
+main.spec
 
 # Installer logs
 pip-log.txt

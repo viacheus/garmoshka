@@ -1,8 +1,21 @@
+import os
 import sqlite3
+import sys
+
+
+def get_database_path():
+    # Determine the base path (folder of the executable or script)
+    if getattr(sys, 'frozen', False):  # Check if running as a PyInstaller executable
+        base_path = sys._MEIPASS  # Folder where the executable is unpacked
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))  # Script directory
+
+    # Build the full path to the database
+    return os.path.join(base_path, "cards.db")
 
 
 def exec_select_query(query, parameters=()):
-    con = sqlite3.connect("cards.db")
+    con = sqlite3.connect(get_database_path())
     cur = con.cursor()
     result = cur.execute(query, parameters).fetchall()
     con.close()
@@ -10,7 +23,7 @@ def exec_select_query(query, parameters=()):
 
 
 def exec_mod_query(query, parameters):
-    con = sqlite3.connect("cards.db")
+    con = sqlite3.connect(get_database_path())
     cur = con.cursor()
     result = cur.execute(query, parameters)
     con.commit()
@@ -90,7 +103,7 @@ def update_card_stat(id, vote):
 
 
 def get_card(id):
-    con = sqlite3.connect("cards.db")
+    con = sqlite3.connect(get_database_path())
     cur = con.cursor()
     result = cur.execute("SELECT * FROM cards WHERE id = ?", (id,)).fetchone()
     con.close()
